@@ -28,13 +28,13 @@ public class Hotel {
     @Column(length = 100)
     private String address;
 
-    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Room> rooms;
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
+    private List<Room> rooms = new ArrayList<>();
 
     public Hotel(HotelDTO hotelDTO) {
         this.name = hotelDTO.getName();
         this.address = hotelDTO.getAddress();
-        
+
         if(hotelDTO.getRooms() != null) {
             this.rooms = hotelDTO.getRooms().stream().map(roomDTO -> {
                 Room room = new Room(roomDTO);

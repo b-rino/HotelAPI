@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Room {
 
 
@@ -30,6 +31,10 @@ public class Room {
     public Room(RoomDTO roomDTO) {
         this.number = roomDTO.getNumber();
         this.price = roomDTO.getPrice();
+    }
+
+    public RoomDTO toDTO(){
+        return new RoomDTO(this);
     }
 
 

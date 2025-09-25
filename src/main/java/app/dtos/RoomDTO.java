@@ -1,6 +1,7 @@
 package app.dtos;
 
 
+import app.entities.Hotel;
 import app.entities.Room;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -24,5 +25,11 @@ public class RoomDTO {
         this.hotelId = room.getHotel().getId();
         this.number = room.getNumber();
         this.price = room.getPrice();
+    }
+
+    public Room toEntity(Hotel hotel) {
+        Room room = new Room();
+        room.setHotel(hotel);
+        return room;
     }
 }
