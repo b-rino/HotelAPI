@@ -46,7 +46,7 @@ public class HotelController {
         ctx.status(201).json(created);
     }
 
-    public void updatedHotel(Context ctx){
+    public void updateHotel(Context ctx){
         int id = Integer.parseInt(ctx.pathParam("id"));
         HotelDTO hotelDTO = ctx.bodyAsClass(HotelDTO.class);
         HotelDTO updated = hotelService.updateHotel(id, hotelDTO);

@@ -1,0 +1,47 @@
+### Ping the API
+GET http://localhost:7000/api/v1/
+
+### Get all hotels
+GET http://localhost:7000/api/v1/hotel
+
+### Create a hotel
+POST http://localhost:7000/api/v1/hotel
+Content-Type: application/json
+
+{
+  "name": "Hotel Helsingør",
+  "address": "Strandvejen 25"
+}
+
+### Get hotel by ID
+GET http://localhost:7000/api/v1/hotel/1
+
+### Update hotel
+PUT http://localhost:7000/api/v1/hotel/2
+Content-Type: application/json
+
+{
+  "name": "Hotel Kronborg",
+  "address": "Kronborgvej 1"
+}
+
+### Get rooms for hotel
+GET http://localhost:7000/api/v1/hotel/1/rooms
+
+### Delete hotel
+DELETE http://localhost:7000/api/v1/hotel/1
+
+---
+
+### Add room to hotel
+POST http://localhost:7000/api/v1/room
+Content-Type: application/json
+
+{
+  "hotelId": 2,
+  "number": "203",
+  "price": 9500.0
+}
+
+### Delete room
+DELETE http://localhost:7000/api/v1/room/1

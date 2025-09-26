@@ -13,7 +13,7 @@ public interface HotelService {
     HotelDTO createHotel(HotelDTO hotelDTO);
     HotelDTO updateHotel(int id, HotelDTO hotelDTO);
     boolean deleteHotel(int id);
-    void addRoom(Hotel hotel, Room room);
+    RoomDTO addRoom(RoomDTO roomDTO);
     void removeRoom(Hotel hotel, Room room);
     List<RoomDTO> getRoomsForHotel(Hotel hotel);
 }

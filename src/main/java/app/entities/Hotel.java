@@ -2,6 +2,7 @@ package app.entities;
 
 
 import app.dtos.HotelDTO;
+import app.dtos.RoomDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,16 +36,18 @@ public class Hotel {
         this.name = hotelDTO.getName();
         this.address = hotelDTO.getAddress();
 
-        if(hotelDTO.getRooms() != null) {
-            this.rooms = hotelDTO.getRooms().stream().map(roomDTO -> {
+        if (hotelDTO.getRooms() != null) {
+            this.rooms = new ArrayList<>();
+            for (RoomDTO roomDTO : hotelDTO.getRooms()) {
                 Room room = new Room(roomDTO);
                 room.setHotel(this);
-                return room;
-            }).toList();
+                this.rooms.add(room);
+            }
         } else {
             this.rooms = new ArrayList<>();
         }
     }
+
 
 
 }

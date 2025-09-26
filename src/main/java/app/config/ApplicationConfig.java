@@ -1,5 +1,6 @@
 package app.config;
 
+import app.routes.Routes;
 import io.javalin.Javalin;
 import jakarta.persistence.EntityManagerFactory;
 

@@ -45,11 +45,8 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
-    public void addRoom(Hotel hotel, Room room) {
-        room.setHotel(hotel);
-        hotel.getRooms().add(room);
-        RoomDTO  roomDTO = new RoomDTO(room);
-        roomDAO.create(roomDTO);
+    public RoomDTO addRoom(RoomDTO roomDTO) {
+        return roomDAO.create(roomDTO);
     }
 
     @Override

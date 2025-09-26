@@ -17,21 +17,27 @@ public class RoomDAO {
     }
 
 
-    public RoomDTO create(RoomDTO roomDTO) {
-        Room room = new Room(roomDTO);
+    public RoomDTO create(RoomDTO dto) {
         try (EntityManager em = emf.createEntityManager()) {
             em.getTransaction().begin();
-            Hotel hotel = em.find(Hotel.class, roomDTO.getHotelId());
+
+            Hotel hotel = em.find(Hotel.class, dto.getHotelId());
             if (hotel == null) {
                 em.getTransaction().rollback();
                 return null;
             }
+
+            Room room = new Room(dto);
             room.setHotel(hotel);
+
             em.persist(room);
             em.getTransaction().commit();
+
+            // Return fresh DTO with generated ID and hotel link
             return new RoomDTO(room);
         }
     }
+
 
 
     public boolean delete(int id) {
