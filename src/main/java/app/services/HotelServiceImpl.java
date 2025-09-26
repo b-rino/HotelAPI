@@ -21,40 +21,41 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     public List<HotelDTO> getAllHotels() {
-        return hotelDAO.getAllHotels();
+        return hotelDAO.getAll();
     }
 
     @Override
     public HotelDTO getHotelById(int id) {
-        return hotelDAO.getHotelById(id);
+        return hotelDAO.getById(id);
     }
 
     @Override
     public HotelDTO createHotel(HotelDTO hotelDTO) {
-        return hotelDAO.createHotel(hotelDTO);
+        return hotelDAO.create(hotelDTO);
     }
 
     @Override
     public HotelDTO updateHotel(int id, HotelDTO hotelDTO) {
-        return hotelDAO.updateHotel(id, hotelDTO);
+        return hotelDAO.update(id, hotelDTO);
     }
 
     @Override
     public boolean deleteHotel(int id) {
-        return hotelDAO.deleteHotel(id);
+        return hotelDAO.delete(id);
     }
 
     @Override
     public void addRoom(Hotel hotel, Room room) {
         room.setHotel(hotel);
         hotel.getRooms().add(room);
-        roomDAO.createRoom(room);
+        RoomDTO  roomDTO = new RoomDTO(room);
+        roomDAO.create(roomDTO);
     }
 
     @Override
     public void removeRoom(Hotel hotel, Room room) {
         hotel.getRooms().remove(room);
-        roomDAO.deleteRoom(room.getId());
+        roomDAO.delete(room.getId());
     }
 
     @Override

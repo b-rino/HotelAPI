@@ -9,7 +9,7 @@ public interface DAO <T, I> {
 
     T getById(I id);
 
-    T update(T t);
+    T update(I i, T t);
 
     boolean delete(I id);
 
