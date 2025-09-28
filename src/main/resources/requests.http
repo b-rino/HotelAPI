@@ -14,10 +14,10 @@ Content-Type: application/json
 }
 
 ### Get hotel by ID
-GET http://localhost:7000/api/v1/hotel/1
+GET http://localhost:7000/api/v1/hotel/2
 
 ### Update hotel
-PUT http://localhost:7000/api/v1/hotel/2
+PUT http://localhost:7000/api/v1/hotel/3
 Content-Type: application/json
 
 {
@@ -29,7 +29,7 @@ Content-Type: application/json
 GET http://localhost:7000/api/v1/hotel/1/rooms
 
 ### Delete hotel
-DELETE http://localhost:7000/api/v1/hotel/1
+DELETE http://localhost:7000/api/v1/hotel/3
 
 ---
 
@@ -38,10 +38,10 @@ POST http://localhost:7000/api/v1/room
 Content-Type: application/json
 
 {
-  "hotelId": 2,
-  "number": "203",
+  "hotelId": 3,
+  "number": "905",
   "price": 9500.0
 }
 
 ### Delete room
-DELETE http://localhost:7000/api/v1/room/1
+DELETE http://localhost:7000/api/v1/room/6

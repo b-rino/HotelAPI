@@ -29,25 +29,7 @@ public class Hotel {
     @Column(length = 100)
     private String address;
 
-    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Room> rooms = new ArrayList<>();
-
-    public Hotel(HotelDTO hotelDTO) {
-        this.name = hotelDTO.getName();
-        this.address = hotelDTO.getAddress();
-
-        if (hotelDTO.getRooms() != null) {
-            this.rooms = new ArrayList<>();
-            for (RoomDTO roomDTO : hotelDTO.getRooms()) {
-                Room room = new Room(roomDTO);
-                room.setHotel(this);
-                this.rooms.add(room);
-            }
-        } else {
-            this.rooms = new ArrayList<>();
-        }
-    }
-
-
 
 }

@@ -1,5 +1,7 @@
 package app.config;
 
+import app.exceptions.HotelNotFoundException;
+import app.exceptions.RoomNotFoundException;
 import app.routes.Routes;
 import io.javalin.Javalin;
 import jakarta.persistence.EntityManager;
@@ -39,10 +41,20 @@ public class ApplicationConfig {
             ctx.status(400).result("Invalid hotel or room data: " + e.getMessage());
         });
 
+        app.exception(HotelNotFoundException.class, (e, ctx) -> {
+            ctx.status(404).result(e.getMessage());
+        });
+
+        app.exception(RoomNotFoundException.class, (e, ctx) -> {
+            ctx.status(404).result(e.getMessage());
+        });
+
+
         app.exception(Exception.class, (e, ctx) -> {
             logger.error("Unhandled exception at [{}] {}: {}", ctx.method(), ctx.path(), e.getMessage(), e);
-            ctx.status(500).result("Internal server error");
+            ctx.status(500).result("Internal server error: " + e.getClass().getSimpleName() + " - " + e.getMessage());
         });
+
     }
 
 

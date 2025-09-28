@@ -22,16 +22,4 @@ public class RoomDTO {
     private String number;
     private double price;
 
-    public RoomDTO(Room room) {
-        this.id = room.getId();
-        this.hotelId = room.getHotel().getId();
-        this.number = room.getNumber();
-        this.price = room.getPrice();
-    }
-
-    public Room toEntity(Hotel hotel) {
-        Room room = new Room();
-        room.setHotel(hotel);
-        return room;
-    }
 }

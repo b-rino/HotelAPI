@@ -2,6 +2,13 @@ package populators;
 
 import app.config.ApplicationConfig;
 import app.config.HibernateConfig;
+import app.daos.HotelDAO;
+import app.daos.RoomDAO;
+import app.dtos.RoomDTO;
+import app.entities.Hotel;
+import app.entities.Room;
+import app.mappers.HotelMapper;
+import app.mappers.RoomMapper;
 import io.javalin.Javalin;
 import io.restassured.RestAssured;
 import jakarta.persistence.EntityManagerFactory;
@@ -92,4 +99,59 @@ public class HotelApiTest {
                 .when().delete("/hotel/{id}")
                 .then().statusCode(anyOf(is(200), is(204)));
     }
+
+    @Test
+    void testCreateRoom() {
+        int hotelId = HotelPopulator.seededHotels.get(0).getId();
+        given().contentType("application/json")
+                .body("{\"hotelId\":" + hotelId + ",\"number\":\"301\",\"price\":999.0}")
+                .when().post("/room")
+                .then().statusCode(201)
+                .body("number", equalTo("301"))
+                .body("price", equalTo(999.0F));
+    }
+
+    @Test
+    void testDeleteRoom_success() {
+        // Arrange: create a hotel and a room
+        int hotelId = HotelPopulator.seededHotels.get(0).getId();
+        HotelDAO hotelDAO = new HotelDAO(HibernateConfig.getEntityManagerFactoryForTest());
+        Hotel hotelEntity = hotelDAO.getById(hotelId);
+
+        RoomDTO roomDTO = RoomDTO.builder()
+                .hotelId(hotelId)
+                .number("999")
+                .price(888.0)
+                .build();
+
+        Room roomEntity = RoomMapper.toEntity(roomDTO, hotelEntity); // sets hotel reference
+        // DO NOT add room to hotel.getRooms() here — let cascade handle it
+
+        RoomDAO roomDAO = new RoomDAO(HibernateConfig.getEntityManagerFactoryForTest());
+        Room createdRoom = roomDAO.create(roomEntity); // persist only the Room
+
+        // Act + Assert: delete the room and expect 200 OK
+        given().pathParam("id", createdRoom.getId())
+                .when().delete("/room/{id}")
+                .then().statusCode(200)
+                .body("id", equalTo(createdRoom.getId()))
+                .body("number", equalTo("999"))
+                .body("price", equalTo(888.0f));
+    }
+
+
+
+    @Test
+    void testDeleteRoom_notFound() {
+        int nonExistentRoomId = 99999;
+
+        given().pathParam("id", nonExistentRoomId)
+                .when().delete("/room/{id}")
+                .then().statusCode(404)
+                .body(equalTo("Room with ID " + nonExistentRoomId + " not found"));
+    }
+
+
+
+
 }

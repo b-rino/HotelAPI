@@ -1,44 +1,37 @@
 package app.daos;
 
-import app.dtos.RoomDTO;
 import app.entities.Hotel;
 import app.entities.Room;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class RoomDAO {
 
     private final EntityManagerFactory emf;
+
     public RoomDAO(EntityManagerFactory emf) {
         this.emf = emf;
     }
 
-
-    public RoomDTO create(RoomDTO dto) {
+    public Room create(Room room) {
         try (EntityManager em = emf.createEntityManager()) {
             em.getTransaction().begin();
 
-            Hotel hotel = em.find(Hotel.class, dto.getHotelId());
-            if (hotel == null) {
-                em.getTransaction().rollback();
-                return null;
-            }
-
-            Room room = new Room(dto);
-            room.setHotel(hotel);
-
+            // Hotel skal allerede være sat på room via service-laget
             em.persist(room);
-            em.getTransaction().commit();
 
-            // Return fresh DTO with generated ID and hotel link
-            return new RoomDTO(room);
+            em.getTransaction().commit();
+            return room;
         }
     }
 
-
+    public Room getById(Integer id) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.find(Room.class, id);
+        }
+    }
 
     public boolean delete(int id) {
         try (EntityManager em = emf.createEntityManager()) {
@@ -48,19 +41,23 @@ public class RoomDAO {
                 em.getTransaction().rollback();
                 return false;
             }
+
+            //breaking bi-directional link to be able to delete without any hibernate errors!
+            Hotel hotel = room.getHotel();
+            if (hotel != null) {
+                hotel.getRooms().remove(room);
+            }
             em.remove(room);
             em.getTransaction().commit();
             return true;
         }
     }
 
-
-    public List<RoomDTO> getRoomsByHotelId(int hotelId) {
+    public List<Room> getRoomsByHotelId(int hotelId) {
         try (EntityManager em = emf.createEntityManager()) {
-            List<Room> rooms = em.createQuery("FROM Room WHERE hotel.id = :hotelId", Room.class)
+            return em.createQuery("FROM Room WHERE hotel.id = :hotelId", Room.class)
                     .setParameter("hotelId", hotelId)
                     .getResultList();
-            return rooms.stream().map(RoomDTO::new).collect(Collectors.toList());
         }
     }
 }

@@ -1,11 +1,14 @@
 package populators;
 
-
 import app.config.HibernateConfig;
 import app.daos.HotelDAO;
 import app.daos.RoomDAO;
 import app.dtos.HotelDTO;
 import app.dtos.RoomDTO;
+import app.entities.Hotel;
+import app.entities.Room;
+import app.mappers.HotelMapper;
+import app.mappers.RoomMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
@@ -21,35 +24,31 @@ public class HotelPopulator {
         HotelDAO hotelDAO = new HotelDAO(emf);
         RoomDAO roomDAO = new RoomDAO(emf);
 
-        HotelDTO h1 = hotelDAO.create(HotelDTO.builder()
-                .name("Backend Inn")
-                .address("Layered Lane 42")
-                .build());
 
-        HotelDTO h2 = hotelDAO.create(HotelDTO.builder().name("DTO Palace").address("Abstraction Ave 7").build());
+        Hotel h1Entity = hotelDAO.create(HotelMapper.toEntity(
+                HotelDTO.builder().name("Backend Inn").address("Layered Lane 42").build()
+        ));
+        Hotel h2Entity = hotelDAO.create(HotelMapper.toEntity(
+                HotelDTO.builder().name("DTO Palace").address("Abstraction Ave 7").build()
+        ));
 
-        RoomDTO room1 = RoomDTO.builder()
-                .hotelId(h1.getId())
-                .number("101")
-                .price(1200.0)
-                .build();
 
-        RoomDTO room2 = RoomDTO.builder()
-                .hotelId(h1.getId())
-                .number("102")
-                .price(1300.0)
-                .build();
+        Room r1Entity = roomDAO.create(RoomMapper.toEntity(
+                RoomDTO.builder().hotelId(h1Entity.getId()).number("101").price(1200.0).build(),
+                h1Entity
+        ));
+        Room r2Entity = roomDAO.create(RoomMapper.toEntity(
+                RoomDTO.builder().hotelId(h1Entity.getId()).number("102").price(1300.0).build(),
+                h1Entity
+        ));
+        Room r3Entity = roomDAO.create(RoomMapper.toEntity(
+                RoomDTO.builder().hotelId(h2Entity.getId()).number("201").price(1500.0).build(),
+                h2Entity
+        ));
 
-        RoomDTO room3 = RoomDTO.builder()
-                .hotelId(h2.getId())
-                .number("201")
-                .price(1500.0)
-                .build();
 
-        roomDAO.create(room1);
-        roomDAO.create(room2);
-        roomDAO.create(room3);
-
+        HotelDTO h1 = HotelMapper.toDTO(h1Entity);
+        HotelDTO h2 = HotelMapper.toDTO(h2Entity);
 
         seededHotels = new ArrayList<>(List.of(h1, h2));
         System.out.println("Seeded " + seededHotels.size() + " hotels.");

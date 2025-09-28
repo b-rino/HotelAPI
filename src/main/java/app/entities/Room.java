@@ -28,16 +28,4 @@ public class Room {
     @JoinColumn(name = "hotel_id")
     private Hotel hotel;
 
-    public Room(RoomDTO roomDTO) {
-        this.number = roomDTO.getNumber();
-        this.price = roomDTO.getPrice();
-    }
-
-    public RoomDTO toDTO(){
-        return new RoomDTO(this);
-    }
-
-
-
-
 }

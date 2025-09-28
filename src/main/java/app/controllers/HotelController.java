@@ -3,6 +3,7 @@ package app.controllers;
 import app.dtos.HotelDTO;
 import app.services.HotelService;
 import io.javalin.http.Context;
+import io.javalin.http.HttpStatus;
 
 public class HotelController {
 
@@ -12,58 +13,47 @@ public class HotelController {
         this.hotelService = hotelService;
     }
 
-    public void getAllHotels(Context ctx){
-        ctx.json(hotelService.getAllHotels());
+    public void getAllHotels(Context ctx) {
+        ctx.status(HttpStatus.OK).json(hotelService.getAllHotels());
     }
 
-    public void getHotelById(Context ctx){
+    public void getHotelById(Context ctx) {
         int id = Integer.parseInt(ctx.pathParam("id"));
         HotelDTO hotelDTO = hotelService.getHotelById(id);
-        if(hotelDTO == null){
-            ctx.status(404);
-        } else {
-            ctx.json(hotelDTO); //automatic sends status code 200 at this point!
-        }
+        ctx.status(HttpStatus.OK).json(hotelDTO);
     }
 
-    public void getRoomsForHotel(Context ctx){
+    public void getRoomsForHotel(Context ctx) {
         int id = Integer.parseInt(ctx.pathParam("id"));
         HotelDTO hotelDTO = hotelService.getHotelById(id);
-        if(hotelDTO == null){
-            ctx.status(404);
-        } else {
-            ctx.json(hotelDTO.getRooms());
-        }
+        ctx.status(HttpStatus.OK).json(hotelDTO.getRooms());
     }
 
-    public void createHotel(Context ctx){
-        HotelDTO hotelDTO = ctx.bodyAsClass(HotelDTO.class);
-        if(hotelDTO.getName() == null || hotelDTO.getAddress() == null){
-            ctx.status(400);
-            return;
-        }
+    public void createHotel(Context ctx) {
+        HotelDTO hotelDTO = ctx.bodyValidator(HotelDTO.class)
+                .check(dto -> dto.getName() != null && !dto.getName().isBlank(), "Hotel name is required")
+                .check(dto -> dto.getAddress() != null && !dto.getAddress().isBlank(), "Hotel address is required")
+                .get();
+
         HotelDTO created = hotelService.createHotel(hotelDTO);
-        ctx.status(201).json(created);
+        ctx.status(HttpStatus.CREATED).json(created);
     }
 
-    public void updateHotel(Context ctx){
+    public void updateHotel(Context ctx) {
         int id = Integer.parseInt(ctx.pathParam("id"));
-        HotelDTO hotelDTO = ctx.bodyAsClass(HotelDTO.class);
+        HotelDTO hotelDTO = ctx.bodyValidator(HotelDTO.class)
+                .check(dto -> dto.getName() != null && !dto.getName().isBlank(), "Hotel name is required")
+                .check(dto -> dto.getAddress() != null && !dto.getAddress().isBlank(), "Hotel address is required")
+                .get();
+
         HotelDTO updated = hotelService.updateHotel(id, hotelDTO);
-        if(updated == null){
-            ctx.status(404);
-        } else {
-            ctx.json(updated);
-        }
+        ctx.status(HttpStatus.OK).json(updated);
     }
 
-    public void deleteHotel(Context ctx){
+    public void deleteHotel(Context ctx) {
         int id = Integer.parseInt(ctx.pathParam("id"));
         HotelDTO deleted = hotelService.getHotelById(id);
-        if(deleted == null || !hotelService.deleteHotel(id)){
-            ctx.status(404);
-        } else {
-            ctx.json(deleted);
-        }
+        hotelService.deleteHotel(id);
+        ctx.status(HttpStatus.OK).json(deleted);
     }
 }

@@ -2,6 +2,7 @@ package app.dtos;
 
 
 import app.entities.Hotel;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class HotelDTO {
 
     private int id;
@@ -18,14 +20,4 @@ public class HotelDTO {
     @Singular
     private List<RoomDTO> rooms;
 
-    public HotelDTO(Hotel hotel) {
-        this.id = hotel.getId();
-        this.name = hotel.getName();
-        this.address = hotel.getAddress();
-        this.rooms = hotel.getRooms().stream().map(RoomDTO::new).toList();
-    }
-
-    public Hotel toEntity() {
-        return new Hotel(this);
-    }
 }
