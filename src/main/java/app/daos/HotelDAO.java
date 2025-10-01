@@ -6,7 +6,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 import java.util.List;
 
-public class HotelDAO implements DAO<Hotel, Integer> {
+public class HotelDAO implements IDAO<Hotel, Integer> {
 
     private final EntityManagerFactory emf;
 

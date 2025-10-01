@@ -1,7 +1,6 @@
 package app.config;
 
-import app.exceptions.HotelNotFoundException;
-import app.exceptions.RoomNotFoundException;
+import app.exceptions.*;
 import app.routes.Routes;
 import io.javalin.Javalin;
 import jakarta.persistence.EntityManager;
@@ -42,12 +41,35 @@ public class ApplicationConfig {
         });
 
         app.exception(HotelNotFoundException.class, (e, ctx) -> {
-            ctx.status(404).result(e.getMessage());
+            String message = "Hotel not found: " + e.getMessage();
+            logger.warn("Handled HotelNotFoundException at [{}] {}: {}", ctx.method(), ctx.path(), message);
+            ctx.status(404).result(message);
         });
 
         app.exception(RoomNotFoundException.class, (e, ctx) -> {
-            ctx.status(404).result(e.getMessage());
+            String message = "Room not found: " + e.getMessage();
+            logger.warn("Handled RoomNotFoundException at [{}] {}: {}", ctx.method(), ctx.path(), message);
+            ctx.status(404).result(message);
         });
+
+        app.exception(ValidationException.class, (e, ctx) -> {
+            String message = "User not verified: " + e.getMessage();
+            logger.warn("Handled ValidationException at [{}] {}: {}", ctx.method(), ctx.path(), message);
+            ctx.status(400).result(message);
+        });
+
+        app.exception(EntityNotFoundException.class, (e, ctx) -> {
+            String message = "Entity not found: " + e.getMessage();
+            logger.warn("Handled EntityNotFoundException at [{}] {}: {}", ctx.method(), ctx.path(), message);
+            ctx.status(404).result(message);
+        });
+
+        app.exception(EntityAlreadyExistsException.class, (e, ctx) -> {
+            String message = "Entity already exists: " + e.getMessage();
+            logger.error("Handled EntityAlreadyExistsException at [{}] {}: {}", ctx.method(), ctx.path(), message);
+            ctx.status(409).result(message); // "409 Conflict"
+        });
+
 
 
         app.exception(Exception.class, (e, ctx) -> {

@@ -24,10 +24,17 @@
         <javalin>6.7.0</javalin>
         <rest-assured>5.4.0</rest-assured>
         <surefire>3.0.0-M7</surefire>
+        <bcrypt.version>0.4</bcrypt.version>
     </properties>
 
     <dependencies>
 
+        <!-- bcrypt -->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>${bcrypt.version}</version>
+        </dependency>
         <!--  JSON    -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>

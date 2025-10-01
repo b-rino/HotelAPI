@@ -1,4 +1,4 @@
-package populators;
+package app;
 
 import app.config.ApplicationConfig;
 import app.config.HibernateConfig;
@@ -7,12 +7,12 @@ import app.daos.RoomDAO;
 import app.dtos.RoomDTO;
 import app.entities.Hotel;
 import app.entities.Room;
-import app.mappers.HotelMapper;
 import app.mappers.RoomMapper;
 import io.javalin.Javalin;
 import io.restassured.RestAssured;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
+import populators.HotelPopulator;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
@@ -148,10 +148,7 @@ public class HotelApiTest {
         given().pathParam("id", nonExistentRoomId)
                 .when().delete("/room/{id}")
                 .then().statusCode(404)
-                .body(equalTo("Room with ID " + nonExistentRoomId + " not found"));
+                .body(containsString("Room not found:"));
     }
-
-
-
 
 }
