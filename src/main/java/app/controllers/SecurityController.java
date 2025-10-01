@@ -15,6 +15,7 @@ public class SecurityController {
     ISecurityDAO dao = new SecurityDAO(HibernateConfig.getEntityManagerFactory());
     ObjectMapper mapper = new Utils().getObjectMapper();
 
+
     public Handler login() {
         return (Context ctx) -> {
             User user = ctx.bodyAsClass(User.class);

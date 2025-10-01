@@ -21,6 +21,8 @@ public class HotelRoutes {
         this.hotelController = new HotelController(hotelService);
     }
 
+    //method referencing for route registration because we are NOT using a handler in RoomController!
+    //Godt valg til CRUD end-points (nemt at teste), men ikke så fleksibel som en Handler (koblet til en controller-instans)
     public EndpointGroup getRoutes() {
         return () -> {
             get("/", hotelController::getAllHotels);
