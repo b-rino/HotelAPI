@@ -83,10 +83,16 @@ public class ApplicationConfig {
     private static void configureLogging(Javalin app) {
         app.before(ctx -> {
             logger.info("Incoming request: [{}] {} at {}", ctx.method(), ctx.path(), java.time.LocalDateTime.now());
+
             if (!ctx.body().isEmpty()) {
-                logger.info("Request body: {}", ctx.body());
+                String body = ctx.body();
+
+                // Masking the password in the log-file
+                String sanitizedBody = body.replaceAll("\"password\"\\s*:\\s*\".*?\"", "\"password\":\"***\"");
+                logger.info("Request body: {}", sanitizedBody);
             }
         });
+
 
         app.after(ctx -> {
             logger.info("Response sent: [{}] {} at {}", ctx.status(), ctx.path(), java.time.LocalDateTime.now());

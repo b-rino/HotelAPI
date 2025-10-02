@@ -25,8 +25,6 @@ public class SecurityDAO implements ISecurityDAO {
             if (user == null) {
                 throw new ValidationException("Invalid username or password");
             } else {
-                //TODO: sout skal fjernes igen !
-                System.out.println("Successfully verified user");
                 return user;
             }
         }
