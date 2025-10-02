@@ -33,7 +33,7 @@ public class HotelApiTest {
 
     @BeforeEach
     void populateDatabase() {
-        HotelPopulator.seedDatabase();
+        HotelPopulator.seedHotels();
     }
 
     @AfterEach

@@ -19,7 +19,7 @@ public class HotelPopulator {
 
     public static List<HotelDTO> seededHotels = new ArrayList<>();
 
-    public static void seedDatabase() {
+    public static void seedHotels() {
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactoryForTest();
         HotelDAO hotelDAO = new HotelDAO(emf);
         RoomDAO roomDAO = new RoomDAO(emf);
