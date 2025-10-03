@@ -71,6 +71,21 @@ public class ApplicationConfig {
         });
 
 
+        app.exception(TokenVerificationException.class, (e, ctx) -> {
+            String message = "Token verification failed: " + e.getMessage();
+            logger.warn("Handled TokenVerificationException at [{}] {}: {}", ctx.method(), ctx.path(), message);
+            ctx.status(401).result(message); // "401 Unauthorized"
+        });
+
+
+        app.exception(TokenCreationException.class, (e, ctx) -> {
+            String message = "Token creation failed: " + e.getMessage();
+            logger.error("Handled TokenCreationException at [{}] {}: {}", ctx.method(), ctx.path(), message);
+            ctx.status(500).result(message); // "500 Internal Server Error"
+        });
+
+
+
 
         app.exception(Exception.class, (e, ctx) -> {
             logger.error("Unhandled exception at [{}] {}: {}", ctx.method(), ctx.path(), e.getMessage(), e);

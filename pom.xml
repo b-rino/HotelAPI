@@ -25,6 +25,7 @@
         <rest-assured>5.4.0</rest-assured>
         <surefire>3.0.0-M7</surefire>
         <bcrypt.version>0.4</bcrypt.version>
+        <jwt.version>9.0.1</jwt.version>
     </properties>
 
     <dependencies>
@@ -162,6 +163,14 @@
             <version>${javalin}</version>
         </dependency>
 
+        <!-- for TokenSecurity class !! -->
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>${jwt.version}</version>
+        </dependency>
+
+
 
     </dependencies>
 
@@ -185,7 +194,8 @@
                         </goals>
                         <configuration>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>app.Main</mainClass> <!-- ← din main-klasse -->
                                 </transformer>
                             </transformers>

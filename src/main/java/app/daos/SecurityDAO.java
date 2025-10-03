@@ -20,19 +20,19 @@ public class SecurityDAO implements ISecurityDAO {
 
     @Override
     public User getVerifiedUser(String username, String password) throws ValidationException {
-        try(EntityManager em = emf.createEntityManager()) {
-            User user = em.find(User.class, username);
-            if (user == null) {
-                throw new ValidationException("Invalid username or password");
+        try (EntityManager em = emf.createEntityManager()) {
+            User foundUser = em.find(User.class, username);
+            if (foundUser.checkPassword(password)) {
+                return foundUser;
             } else {
-                return user;
+                throw new ValidationException("Invalid username or password");
             }
         }
     }
 
     @Override
     public User createUser(String username, String password) throws EntityAlreadyExistsException {
-        try(EntityManager em = emf.createEntityManager()) {
+        try (EntityManager em = emf.createEntityManager()) {
             User user = em.find(User.class, username);
             if (user == null) {
                 em.getTransaction().begin();
@@ -62,7 +62,7 @@ public class SecurityDAO implements ISecurityDAO {
     public Role createRole(String roleName) throws EntityAlreadyExistsException {
         try (EntityManager em = emf.createEntityManager()) {
             Role role = em.find(Role.class, roleName);
-            if(role == null) {
+            if (role == null) {
                 role = new Role(roleName);
                 em.getTransaction().begin();
                 em.persist(role);
