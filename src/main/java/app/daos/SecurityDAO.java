@@ -74,6 +74,18 @@ public class SecurityDAO implements ISecurityDAO {
         }
     }
 
+    @Override
+    public boolean existingUsername(String username)  {
+        try(EntityManager em = emf.createEntityManager()){
+            User user = em.find(User.class, username);
+            if(user != null){
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
     public static void main(String[] args) throws EntityNotFoundException {
         SecurityDAO dao = new SecurityDAO(HibernateConfig.getEntityManagerFactory());
 
