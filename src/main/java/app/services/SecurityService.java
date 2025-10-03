@@ -19,7 +19,7 @@ public class SecurityService {
 
     private final SecurityDAO dao;
     private final TokenSecurity tokenSecurity;
-    private final Logger logger = LoggerFactory.getLogger(SecurityService.class);
+    private static final Logger logger = LoggerFactory.getLogger(SecurityService.class);
 
     public SecurityService(SecurityDAO dao, TokenSecurity ts){
         this.dao = dao;
@@ -50,52 +50,71 @@ public class SecurityService {
     }
 
 
-    private static String getToken(Context ctx){
+    private static String getToken(Context ctx) throws TokenVerificationException {
         String header = ctx.header("Authorization");
-        if (header == null) {
-            throw new UnauthorizedResponse("Authorization header is missing"); // UnauthorizedResponse is javalin 6 specific but response is not json!
+        if (header == null || header.isBlank()) {
+            logger.warn("Missing Authorization header at [{}] {}", ctx.method().toString(), ctx.path());
+            throw new TokenVerificationException("Authorization header is missing");
         }
 
-        // If the Authorization Header was malformed, then no entry
-        String token = header.split(" ")[1];
-        if (token == null) {
-            throw new UnauthorizedResponse("Authorization header is malformed"); // UnauthorizedResponse is javalin 6 specific but response is not json!
+        String[] parts = header.split(" ");
+        if (parts.length != 2 || !parts[0].equalsIgnoreCase("Bearer") || parts[1].isBlank()) {
+            logger.warn("Malformed Authorization header at [{}] {}: '{}'", ctx.method().toString(), ctx.path(), header);
+            throw new TokenVerificationException("Authorization header is malformed");
         }
-        return token;
+        return parts[1];
     }
 
 
-    private UserDTO verifyToken(String token) throws TokenVerificationException{
+    private UserDTO verifyToken(String token) throws TokenVerificationException {
         boolean IS_DEPLOYED = (System.getenv("DEPLOYED") != null);
-        String SECRET = IS_DEPLOYED ? System.getenv("SECRET_KEY") : Utils.getPropertyValue("SECRET_KEY", "config.properties");
+        String SECRET = IS_DEPLOYED
+                ? System.getenv("SECRET_KEY")
+                : Utils.getPropertyValue("SECRET_KEY", "config.properties");
 
         try {
-            if (tokenSecurity.tokenIsValid(token, SECRET) && tokenSecurity.tokenNotExpired(token)) {
-                return tokenSecurity.getUserWithRolesFromToken(token);
-            } else {
-                throw new UnauthorizedResponse("Invalid token");
+            if (!tokenSecurity.tokenIsValid(token, SECRET)) {
+                logger.warn("Token signature invalid for token");
+                throw new TokenVerificationException("Token signature is invalid");
             }
+
+            if (!tokenSecurity.tokenNotExpired(token)) {
+                logger.warn("Token expired for token");
+                throw new TokenVerificationException("Token has expired");
+            }
+
+            return tokenSecurity.getUserWithRolesFromToken(token);
+
         } catch (ParseException | TokenVerificationException e) {
-            //  logger.error("Could not create token", e);
+            logger.warn("Token verification failed: {}", e.getMessage(), e);
             throw new TokenVerificationException("Could not verify token", e);
         }
     }
 
 
 
-    private UserDTO validateAndGetUserFromToken(Context ctx) {
+
+    private UserDTO validateAndGetUserFromToken(Context ctx) throws TokenVerificationException  {
         String token = getToken(ctx);
         UserDTO verifiedTokenUser = verifyToken(token);
+
         if (verifiedTokenUser == null) {
-            throw new UnauthorizedResponse("Invalid user or token"); // UnauthorizedResponse is javalin 6 specific but response is not json!
+            logger.warn("Token verified but no user found at [{}] {}", ctx.method().toString(), ctx.path());
+            throw new TokenVerificationException("Token is valid but user could not be resolved");
         }
         return verifiedTokenUser;
     }
 
     private static boolean userHasAllowedRole(UserDTO user, Set<String> allowedRoles) {
+        if (user == null || user.getRoles() == null || allowedRoles == null || allowedRoles.isEmpty()) {
+            return false;
+        }
+
         return user.getRoles().stream()
-                .anyMatch(role -> allowedRoles.contains(role.toUpperCase()));
+                .map(String::toUpperCase)
+                .anyMatch(allowedRoles::contains);
     }
+
 
     private boolean isOpenEndpoint(Set<String> allowedRoles) {
         // If the endpoint is not protected with any roles:
