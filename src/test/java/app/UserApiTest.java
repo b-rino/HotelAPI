@@ -43,6 +43,8 @@ public class UserApiTest {
         ApplicationConfig.stopServer(app);
     }
 
+
+    //TODO: Not created yet! just copied from another project!
     @Test
     public void testLoginForSeededUser() {
         given()
