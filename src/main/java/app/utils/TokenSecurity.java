@@ -20,6 +20,8 @@ import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+
+//Class originally from Hartmann's dependency. Just copied it to my own project!
 public class TokenSecurity {
     public UserDTO getUserWithRolesFromToken(String token) throws ParseException {
         SignedJWT jwt = SignedJWT.parse(token);

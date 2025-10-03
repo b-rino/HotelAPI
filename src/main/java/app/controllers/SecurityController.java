@@ -8,6 +8,8 @@ import app.entities.Role;
 import app.entities.User;
 import app.exceptions.EntityAlreadyExistsException;
 import app.exceptions.ValidationException;
+import app.services.ISecurityService;
+import app.services.SecurityService;
 import app.utils.TokenSecurity;
 import app.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,22 +22,29 @@ import java.util.stream.Collectors;
 
 public class SecurityController implements ISecurityController {
 
-    ISecurityDAO dao = new SecurityDAO(HibernateConfig.getEntityManagerFactory());
-    ObjectMapper mapper = new Utils().getObjectMapper();
-    TokenSecurity tokenSecurity = new TokenSecurity();
+
+    private final ISecurityService securityService;
+    private final ObjectMapper mapper;
+
+
+    public SecurityController(ISecurityService securityService, ObjectMapper mapper){
+        this.securityService = securityService;
+        this.mapper = mapper;
+    }
+
 
 
     //Don't need to "throw exception" in method signature because the functional interface of Handler already does it! you can throw any exception in the lambda!
     @Override
     public Handler login() {
         return (Context ctx) -> {
-            User user;
+            User incomingUser;
             try {
-                user = ctx.bodyAsClass(User.class);
+                incomingUser = ctx.bodyAsClass(User.class);
             } catch (Exception e) {
                 throw new ValidationException("Invalid request body");
             }
-            User checkedUser = dao.getVerifiedUser(user.getUsername(), user.getPassword());
+            User checkedUser = securityService.getVerifiedUser(incomingUser.getUsername(), incomingUser.getPassword());
 
             if (checkedUser == null) {
                 throw new ValidationException("Invalid username or password");
@@ -48,31 +57,22 @@ public class SecurityController implements ISecurityController {
     @Override
     public Handler register() {
         return ctx -> {
-            User incomingUser;
-            try {
-                incomingUser = ctx.bodyAsClass(User.class);
-            } catch (Exception e) {
-                throw new ValidationException("Invalid request body");
-            }
+            User incomingUser = ctx.bodyValidator(User.class)
+                    .check(u -> u.getUsername() != null && !u.getUsername().isBlank(), "Username is required")
+                    .check(u -> u.getPassword() != null && !u.getPassword().isBlank(), "Password is required")
+                    .get();
 
-            boolean isUsernameTaken = dao.existingUsername(incomingUser.getUsername());
-            if(isUsernameTaken){
-                throw new EntityAlreadyExistsException("Username not available");
-            } else {
-                User newUser = dao.createUser(incomingUser.getUsername(), incomingUser.getPassword());
-                //Hard-coding all new users to "user"-role!
-                User newUserWithRoles = dao.addUserRole(newUser.getUsername(), "User");
-                Set<String> roleNames = newUserWithRoles.getRoles().stream().map(Role::getRoleName).collect(Collectors.toSet());
+            UserDTO userDTO = securityService.register(incomingUser.getUsername(), incomingUser.getPassword());
+            String token = securityService.createToken(userDTO);
 
-                UserDTO userDTO = new UserDTO(newUserWithRoles.getUsername(), roleNames);
-                String token = createToken(userDTO);
+            ObjectNode on = mapper.createObjectNode()
+                    .put("token", token)
+                    .put("Username", userDTO.getUsername());
 
-                //TODO: Maybe not a good idea to send back the token in clear text!?
-                ObjectNode on = mapper.createObjectNode().put("token", token).put("Username", userDTO.getUsername());
-                ctx.json(on).status(201);
-            }
+            ctx.json(on).status(201);
         };
     }
+
 
     @Override
     public Handler authenticate() {

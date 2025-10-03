@@ -2,8 +2,9 @@ package app.services;
 
 import app.daos.SecurityDAO;
 import app.dtos.UserDTO;
-import app.exceptions.TokenCreationException;
-import app.exceptions.TokenVerificationException;
+import app.entities.Role;
+import app.entities.User;
+import app.exceptions.*;
 import app.utils.TokenSecurity;
 import app.utils.Utils;
 import io.javalin.http.Context;
@@ -14,8 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-public class SecurityService {
+public class SecurityService implements ISecurityService{
 
     private final SecurityDAO dao;
     private final TokenSecurity tokenSecurity;
@@ -27,7 +29,8 @@ public class SecurityService {
     }
 
 
-    private String createToken(UserDTO user) throws TokenCreationException {
+    @Override
+    public String createToken(UserDTO user) throws TokenCreationException {
         try {
             String ISSUER;
             String TOKEN_EXPIRE_TIME;
@@ -49,8 +52,8 @@ public class SecurityService {
         }
     }
 
-
-    private static String getToken(Context ctx) throws TokenVerificationException {
+    @Override
+    public String getToken(Context ctx) throws TokenVerificationException {
         String header = ctx.header("Authorization");
         if (header == null || header.isBlank()) {
             logger.warn("Missing Authorization header at [{}] {}", ctx.method().toString(), ctx.path());
@@ -66,7 +69,8 @@ public class SecurityService {
     }
 
 
-    private UserDTO verifyToken(String token) throws TokenVerificationException {
+    @Override
+    public UserDTO verifyToken(String token) throws TokenVerificationException {
         boolean IS_DEPLOYED = (System.getenv("DEPLOYED") != null);
         String SECRET = IS_DEPLOYED
                 ? System.getenv("SECRET_KEY")
@@ -92,9 +96,8 @@ public class SecurityService {
     }
 
 
-
-
-    private UserDTO validateAndGetUserFromToken(Context ctx) throws TokenVerificationException  {
+    @Override
+    public UserDTO validateAndGetUserFromToken(Context ctx) throws TokenVerificationException  {
         String token = getToken(ctx);
         UserDTO verifiedTokenUser = verifyToken(token);
 
@@ -105,7 +108,7 @@ public class SecurityService {
         return verifiedTokenUser;
     }
 
-    private static boolean userHasAllowedRole(UserDTO user, Set<String> allowedRoles) {
+    public boolean userHasAllowedRole(UserDTO user, Set<String> allowedRoles) {
         if (user == null || user.getRoles() == null || allowedRoles == null || allowedRoles.isEmpty()) {
             return false;
         }
@@ -116,7 +119,8 @@ public class SecurityService {
     }
 
 
-    private boolean isOpenEndpoint(Set<String> allowedRoles) {
+    @Override
+    public boolean isOpenEndpoint(Set<String> allowedRoles) {
         // If the endpoint is not protected with any roles:
         if (allowedRoles.isEmpty())
             return true;
@@ -127,5 +131,40 @@ public class SecurityService {
         }
         return false;
     }
+
+
+    public User getVerifiedUser(String username, String password) throws ValidationException {
+        try{
+            return dao.getVerifiedUser(username, password);
+        } catch (Exception e){
+            throw new ValidationException("Invalid username or password");
+        }
+    }
+
+    public boolean existingUsername(String username){
+        return dao.existingUsername(username);
+    }
+
+    public UserDTO register(String username, String password) throws EntityAlreadyExistsException, EntityNotFoundException {
+        if (dao.existingUsername(username)) {
+            throw new EntityAlreadyExistsException("Username not available");
+        }
+
+        User newUser = dao.createUser(username, password);
+        User newUserWithRoles;
+        try{
+            newUserWithRoles = dao.addUserRole(newUser.getUsername(), "User");
+        } catch (EntityNotFoundException e){
+            throw new EntityNotFoundException("Either user or role doesn't exist!");
+        }
+
+        Set<String> roleNames = newUserWithRoles.getRoles().stream()
+                .map(Role::getRoleName)
+                .collect(Collectors.toSet());
+
+        return new UserDTO(newUserWithRoles.getUsername(), roleNames);
+    }
+
+
 
 }
