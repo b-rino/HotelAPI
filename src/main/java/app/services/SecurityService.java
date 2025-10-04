@@ -165,6 +165,4 @@ public class SecurityService implements ISecurityService{
         return new UserDTO(newUserWithRoles.getUsername(), roleNames);
     }
 
-
-
 }

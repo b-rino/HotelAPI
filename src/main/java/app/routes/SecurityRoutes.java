@@ -25,14 +25,13 @@ public class SecurityRoutes {
         this.securityController = new SecurityController(securityService, mapper);
     }
 
-    //functional style route registration because we use "Handler" in controller
-    //good for authentication and easy to pass around!
+
     public EndpointGroup getRoutes() {
         return () -> {
             post("login", securityController.login());
             post("register", securityController.register());
-            get("authenticate", securityController.authenticate());
-            get("authorize", securityController.authorize());
+            //get("authenticate", securityController.authenticate());
+            //get("authorize", securityController.authorize());
         };
     }
 }

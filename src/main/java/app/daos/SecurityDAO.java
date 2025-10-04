@@ -33,12 +33,13 @@ public class SecurityDAO implements ISecurityDAO {
     @Override
     public User createUser(String username, String password) throws EntityAlreadyExistsException {
         try (EntityManager em = emf.createEntityManager()) {
-            User user = em.find(User.class, username);
-            if (user == null) {
+            User existing = em.find(User.class, username);
+            if (existing == null) {
+                User newUser = new User(username, password);
                 em.getTransaction().begin();
                 em.persist(new User(username, password));
                 em.getTransaction().commit();
-                return user;
+                return newUser;
             } else throw new EntityAlreadyExistsException("Username already exists");
         }
     }
