@@ -30,8 +30,15 @@ public class SecurityRoutes {
         return () -> {
             post("login", securityController.login());
             post("register", securityController.register());
-            get("authenticate", securityController.authenticate());
-            //get("authorize", securityController.authorize());
         };
     }
+
+
+    public EndpointGroup getSecuredRoutes() {
+        return () -> {
+            get("authenticate", securityController.authenticate());
+            get("authorize", securityController.authorize());
+        };
+    }
+
 }

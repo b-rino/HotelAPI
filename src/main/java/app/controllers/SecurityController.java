@@ -89,8 +89,22 @@ public class SecurityController implements ISecurityController {
 
     @Override
     public Handler authorize() {
-        return null;
+        return ctx -> {
+          Set<String> allowedRoles = ctx.routeRoles().
+          stream().map(role -> role.toString().toUpperCase()).
+                  collect(Collectors.toSet());
+
+          if(SecurityUtils.isOpenEndpoint(allowedRoles)) {
+              return;
+          }
+          UserDTO user = ctx.attribute("user");
+          if (user == null){
+              throw new ValidationException("No user was added from the token");
+          }
+
+          if(!securityService.userHasAllowedRole(user, allowedRoles)){
+              throw new ValidationException("User was not authorized with roles: " + user.getRoles());
+          }
+        };
     }
-
-
 }
