@@ -4,7 +4,7 @@ import app.controllers.SecurityController;
 import app.daos.SecurityDAO;
 import app.services.ISecurityService;
 import app.services.SecurityService;
-import app.utils.TokenSecurity;
+import app.utils.SecurityUtils;
 import app.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.apibuilder.EndpointGroup;
@@ -18,8 +18,8 @@ public class SecurityRoutes {
 
     public SecurityRoutes(EntityManagerFactory emf){
         SecurityDAO dao = new SecurityDAO(emf);
-        TokenSecurity tokenSecurity = new TokenSecurity();
-        ISecurityService securityService = new SecurityService(dao, tokenSecurity);
+        SecurityUtils securityUtils = new SecurityUtils();
+        ISecurityService securityService = new SecurityService(dao, securityUtils);
         ObjectMapper mapper = new Utils().getObjectMapper();
 
         this.securityController = new SecurityController(securityService, mapper);
@@ -30,7 +30,7 @@ public class SecurityRoutes {
         return () -> {
             post("login", securityController.login());
             post("register", securityController.register());
-            //get("authenticate", securityController.authenticate());
+            get("authenticate", securityController.authenticate());
             //get("authorize", securityController.authorize());
         };
     }

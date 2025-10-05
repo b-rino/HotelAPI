@@ -19,8 +19,6 @@ public interface ISecurityService {
 
     boolean userHasAllowedRole(UserDTO user, Set<String> allowedRoles);
 
-    boolean isOpenEndpoint(Set<String> allowedRoles);
-
     User getVerifiedUser(String username, String password) throws ValidationException;
 
     boolean existingUsername(String username);

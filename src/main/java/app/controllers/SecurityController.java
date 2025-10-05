@@ -1,17 +1,10 @@
 package app.controllers;
 
-import app.config.HibernateConfig;
-import app.daos.ISecurityDAO;
-import app.daos.SecurityDAO;
 import app.dtos.UserDTO;
-import app.entities.Role;
 import app.entities.User;
-import app.exceptions.EntityAlreadyExistsException;
 import app.exceptions.ValidationException;
 import app.services.ISecurityService;
-import app.services.SecurityService;
-import app.utils.TokenSecurity;
-import app.utils.Utils;
+import app.utils.SecurityUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.javalin.http.Context;
@@ -76,7 +69,22 @@ public class SecurityController implements ISecurityController {
 
     @Override
     public Handler authenticate() {
-        return null;
+        return ctx -> {
+            if (ctx.method().toString().equals("OPTIONS")){
+                ctx.status(200);
+                return;
+            }
+
+            //If the endpoint is not protected with roles (or open to role ANYONE) then skip
+            Set<String> allowedRoles = ctx.routeRoles().stream().
+                    map(role -> role.toString().toUpperCase()).collect(Collectors.toSet());
+            if(SecurityUtils.isOpenEndpoint(allowedRoles))
+                return;
+
+            UserDTO verifiedTokenUser = securityService.validateAndGetUserFromToken(ctx);
+            ctx.attribute("user", verifiedTokenUser);
+
+        };
     }
 
     @Override

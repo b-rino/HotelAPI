@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 
 //Class originally from Hartmann's dependency. Just copied it to my own project!
-public class TokenSecurity {
+public class SecurityUtils {
     public UserDTO getUserWithRolesFromToken(String token) throws ParseException {
         SignedJWT jwt = SignedJWT.parse(token);
         String roles = jwt.getJWTClaimsSet().getClaim("roles").toString();
@@ -67,4 +67,19 @@ public class TokenSecurity {
             throw new TokenCreationException("Could not create token", e);
         }
     }
+
+
+    public static boolean isOpenEndpoint(Set<String> allowedRoles) {
+        // If the endpoint is not protected with any roles:
+        if (allowedRoles.isEmpty())
+            return true;
+
+        // 1. Get permitted roles and Check if the endpoint is open to all with the ANYONE role
+        if (allowedRoles.contains("ANYONE")) {
+            return true;
+        }
+        return false;
+    }
+
+
 }
