@@ -1,20 +1,44 @@
 package app.routes;
 
 import app.controllers.SecurityController;
+import app.daos.SecurityDAO;
+import app.services.ISecurityService;
+import app.services.SecurityService;
+import app.utils.SecurityUtils;
+import app.utils.Utils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.apibuilder.EndpointGroup;
+import jakarta.persistence.EntityManagerFactory;
 
-import static io.javalin.apibuilder.ApiBuilder.path;
-import static io.javalin.apibuilder.ApiBuilder.post;
+import static io.javalin.apibuilder.ApiBuilder.*;
 
 public class SecurityRoutes {
 
-    private SecurityController controller = new SecurityController();
+    private final SecurityController securityController;
 
-    //functional style route registration because we use "Handler" in controller
-    //good for authentication and easy to pass around!
+    public SecurityRoutes(EntityManagerFactory emf){
+        SecurityDAO dao = new SecurityDAO(emf);
+        SecurityUtils securityUtils = new SecurityUtils();
+        ISecurityService securityService = new SecurityService(dao, securityUtils);
+        ObjectMapper mapper = new Utils().getObjectMapper();
+
+        this.securityController = new SecurityController(securityService, mapper);
+    }
+
+
     public EndpointGroup getRoutes() {
         return () -> {
-            post("login", controller.login());
+            post("login", securityController.login());
+            post("register", securityController.register());
         };
     }
+
+
+    public EndpointGroup getSecuredRoutes() {
+        return () -> {
+            get("authenticate", securityController.authenticate());
+            get("authorize", securityController.authorize());
+        };
+    }
+
 }

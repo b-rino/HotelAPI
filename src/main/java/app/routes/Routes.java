@@ -19,7 +19,7 @@ public class Routes {
     public Routes(EntityManagerFactory emf) {
         this.hotelRoutes = new HotelRoutes(emf);
         this.roomRoutes = new RoomRoutes(emf);
-        this.securityRoutes = new SecurityRoutes();
+        this.securityRoutes = new SecurityRoutes(emf);
     }
 
     public EndpointGroup getRoutes(){

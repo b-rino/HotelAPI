@@ -12,4 +12,5 @@ public interface ISecurityDAO {
     //Role createRole(String role);
     User addUserRole(String username, String role) throws EntityNotFoundException;
     Role createRole(String roleName) throws EntityAlreadyExistsException;
+    boolean existingUsername(String username);
 }

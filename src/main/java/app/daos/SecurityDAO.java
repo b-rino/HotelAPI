@@ -20,25 +20,26 @@ public class SecurityDAO implements ISecurityDAO {
 
     @Override
     public User getVerifiedUser(String username, String password) throws ValidationException {
-        try(EntityManager em = emf.createEntityManager()) {
-            User user = em.find(User.class, username);
-            if (user == null) {
-                throw new ValidationException("Invalid username or password");
+        try (EntityManager em = emf.createEntityManager()) {
+            User foundUser = em.find(User.class, username);
+            if (foundUser.checkPassword(password)) {
+                return foundUser;
             } else {
-                return user;
+                throw new ValidationException("Invalid username or password");
             }
         }
     }
 
     @Override
     public User createUser(String username, String password) throws EntityAlreadyExistsException {
-        try(EntityManager em = emf.createEntityManager()) {
-            User user = em.find(User.class, username);
-            if (user == null) {
+        try (EntityManager em = emf.createEntityManager()) {
+            User existing = em.find(User.class, username);
+            if (existing == null) {
+                User newUser = new User(username, password);
                 em.getTransaction().begin();
                 em.persist(new User(username, password));
                 em.getTransaction().commit();
-                return user;
+                return newUser;
             } else throw new EntityAlreadyExistsException("Username already exists");
         }
     }
@@ -62,7 +63,7 @@ public class SecurityDAO implements ISecurityDAO {
     public Role createRole(String roleName) throws EntityAlreadyExistsException {
         try (EntityManager em = emf.createEntityManager()) {
             Role role = em.find(Role.class, roleName);
-            if(role == null) {
+            if (role == null) {
                 role = new Role(roleName);
                 em.getTransaction().begin();
                 em.persist(role);
@@ -70,6 +71,18 @@ public class SecurityDAO implements ISecurityDAO {
                 return role;
             } else {
                 throw new EntityAlreadyExistsException("Role already exists");
+            }
+        }
+    }
+
+    @Override
+    public boolean existingUsername(String username)  {
+        try(EntityManager em = emf.createEntityManager()){
+            User user = em.find(User.class, username);
+            if(user != null){
+                return true;
+            } else {
+                return false;
             }
         }
     }

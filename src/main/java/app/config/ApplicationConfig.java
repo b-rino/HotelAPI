@@ -1,5 +1,6 @@
 package app.config;
 
+import app.dtos.ErrorResponseDTO;
 import app.exceptions.*;
 import app.routes.Routes;
 import io.javalin.Javalin;
@@ -34,50 +35,99 @@ public class ApplicationConfig {
         app.stop();
     }
 
+
     private static void configureExceptionHandling(Javalin app) {
         app.exception(IllegalStateException.class, (e, ctx) -> {
             logger.warn("Bad request at [{}] {}: {}", ctx.method(), ctx.path(), e.getMessage());
-            ctx.status(400).result("Invalid hotel or room data: " + e.getMessage());
+            ctx.status(400).json(new ErrorResponseDTO(
+                    "Invalid hotel or room data",
+                    e.getMessage(),
+                    ctx.path(),
+                    ctx.method().toString()
+            ));
         });
 
         app.exception(HotelNotFoundException.class, (e, ctx) -> {
-            String message = "Hotel not found: " + e.getMessage();
-            logger.warn("Handled HotelNotFoundException at [{}] {}: {}", ctx.method(), ctx.path(), message);
-            ctx.status(404).result(message);
+            logger.warn("Handled HotelNotFoundException at [{}] {}: {}", ctx.method(), ctx.path(), e.getMessage());
+            ctx.status(404).json(new ErrorResponseDTO(
+                    "Hotel not found",
+                    e.getMessage(),
+                    ctx.path(),
+                    ctx.method().toString()
+            ));
         });
 
         app.exception(RoomNotFoundException.class, (e, ctx) -> {
-            String message = "Room not found: " + e.getMessage();
-            logger.warn("Handled RoomNotFoundException at [{}] {}: {}", ctx.method(), ctx.path(), message);
-            ctx.status(404).result(message);
+            logger.warn("Handled RoomNotFoundException at [{}] {}: {}", ctx.method(), ctx.path(), e.getMessage());
+            ctx.status(404).json(new ErrorResponseDTO(
+                    "Room not found",
+                    e.getMessage(),
+                    ctx.path(),
+                    ctx.method().toString()
+            ));
         });
 
         app.exception(ValidationException.class, (e, ctx) -> {
-            String message = "User not verified: " + e.getMessage();
-            logger.warn("Handled ValidationException at [{}] {}: {}", ctx.method(), ctx.path(), message);
-            ctx.status(400).result(message);
+            logger.warn("Handled ValidationException at [{}] {}: {}", ctx.method(), ctx.path(), e.getMessage());
+            ctx.status(400).json(new ErrorResponseDTO(
+                    "User not verified",
+                    e.getMessage(),
+                    ctx.path(),
+                    ctx.method().toString()
+            ));
         });
 
         app.exception(EntityNotFoundException.class, (e, ctx) -> {
-            String message = "Entity not found: " + e.getMessage();
-            logger.warn("Handled EntityNotFoundException at [{}] {}: {}", ctx.method(), ctx.path(), message);
-            ctx.status(404).result(message);
+            logger.warn("Handled EntityNotFoundException at [{}] {}: {}", ctx.method(), ctx.path(), e.getMessage());
+            ctx.status(404).json(new ErrorResponseDTO(
+                    "Entity not found",
+                    e.getMessage(),
+                    ctx.path(),
+                    ctx.method().toString()
+            ));
         });
 
         app.exception(EntityAlreadyExistsException.class, (e, ctx) -> {
-            String message = "Entity already exists: " + e.getMessage();
-            logger.error("Handled EntityAlreadyExistsException at [{}] {}: {}", ctx.method(), ctx.path(), message);
-            ctx.status(409).result(message); // "409 Conflict"
+            logger.error("Handled EntityAlreadyExistsException at [{}] {}: {}", ctx.method(), ctx.path(), e.getMessage());
+            ctx.status(409).json(new ErrorResponseDTO(
+                    "Entity already exists",
+                    e.getMessage(),
+                    ctx.path(),
+                    ctx.method().toString()
+            ));
         });
 
+        app.exception(TokenVerificationException.class, (e, ctx) -> {
+            logger.warn("Handled TokenVerificationException at [{}] {}: {}", ctx.method(), ctx.path(), e.getMessage());
+            ctx.status(401).json(new ErrorResponseDTO(
+                    "Token verification failed",
+                    e.getMessage(),
+                    ctx.path(),
+                    ctx.method().toString()
+            ));
+        });
 
+        app.exception(TokenCreationException.class, (e, ctx) -> {
+            logger.error("Handled TokenCreationException at [{}] {}: {}", ctx.method(), ctx.path(), e.getMessage());
+            ctx.status(500).json(new ErrorResponseDTO(
+                    "Token creation failed",
+                    e.getMessage(),
+                    ctx.path(),
+                    ctx.method().toString()
+            ));
+        });
 
         app.exception(Exception.class, (e, ctx) -> {
             logger.error("Unhandled exception at [{}] {}: {}", ctx.method(), ctx.path(), e.getMessage(), e);
-            ctx.status(500).result("Internal server error: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+            ctx.status(500).json(new ErrorResponseDTO(
+                    "Internal server error",
+                    e.getClass().getSimpleName() + " - " + e.getMessage(),
+                    ctx.path(),
+                    ctx.method().toString()
+            ));
         });
-
     }
+
 
 
     private static void configureLogging(Javalin app) {
