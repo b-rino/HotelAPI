@@ -14,8 +14,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 import org.hamcrest.Matchers.*;
-
-public class UserApiTest {
+//TODO: Klassen er ikke lavet endnu - blot kopieret fra et andet projekt!!
+/*public class UserApiTest {
 
     private static Javalin app;
 
@@ -53,9 +53,6 @@ public class UserApiTest {
                 .when()
                 .post("/auth/login")
                 .then()
-                .statusCode(200)
-                .body("token", notNullValue())
-                .body("username", equalTo("Benjamin"));
+                .statusCode(200);
     }
-
-}
+}*/

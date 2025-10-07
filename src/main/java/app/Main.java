@@ -10,6 +10,6 @@ public class Main {
 
         EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
 
-        ApplicationConfig.startServer(7000, emf);
+        ApplicationConfig.startServer(7073, emf);
     }
 }

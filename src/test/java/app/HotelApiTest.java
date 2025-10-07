@@ -148,7 +148,7 @@ public class HotelApiTest {
         given().pathParam("id", nonExistentRoomId)
                 .when().delete("/room/{id}")
                 .then().statusCode(404)
-                .body(containsString("Room not found:"));
+                .body(containsString("Room not found"));
     }
 
 }

@@ -30,6 +30,7 @@ public class SecurityRoutes {
         return () -> {
             post("login", securityController.login());
             post("register", securityController.register());
+            get("healthcheck", securityController::healthCheck);
         };
     }
 

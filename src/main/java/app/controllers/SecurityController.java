@@ -107,4 +107,9 @@ public class SecurityController implements ISecurityController {
           }
         };
     }
+
+
+    public void healthCheck(Context ctx) {
+        ctx.status(200).json("{\"msg\": \"API is up and running\"}");
+    }
 }
