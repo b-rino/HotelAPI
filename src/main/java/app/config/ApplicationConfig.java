@@ -1,9 +1,12 @@
 package app.config;
 
+import app.controllers.SecurityController;
 import app.dtos.ErrorResponseDTO;
 import app.exceptions.*;
 import app.routes.Routes;
+import app.routes.SecurityRoutes;
 import io.javalin.Javalin;
+import io.javalin.http.UnauthorizedResponse;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.slf4j.Logger;
@@ -13,10 +16,9 @@ public class ApplicationConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(ApplicationConfig.class);
 
-
-
     public static Javalin startServer(int port, EntityManagerFactory emf) {
         Routes routes = new Routes(emf);
+        SecurityRoutes securityRoutes = new SecurityRoutes(emf);
         Javalin app = Javalin.create(config -> {
             config.showJavalinBanner = false;
             config.bundledPlugins.enableRouteOverview("/routes");
@@ -24,6 +26,7 @@ public class ApplicationConfig {
             config.router.apiBuilder(routes.getRoutes());
         });
 
+        configureSecurity(app, securityRoutes.getSecurityController());
         configureLogging(app);
         configureExceptionHandling(app);
 
@@ -117,6 +120,18 @@ public class ApplicationConfig {
             ));
         });
 
+        //Javalin exception, which I import and then override output to JSON! Default is status code 401 and no JSON (+ added logging)
+        app.exception(UnauthorizedResponse.class, (e, ctx) -> {
+            logger.warn("Handled UnauthorizedResponse at [{}] {}: {}", ctx.method(), ctx.path(), e.getMessage());
+            ctx.status(401).json(new ErrorResponseDTO(
+                    "Unauthorized access",
+                    e.getMessage(),
+                    ctx.path(),
+                    ctx.method().toString()
+            ));
+        });
+
+
         app.exception(Exception.class, (e, ctx) -> {
             logger.error("Unhandled exception at [{}] {}: {}", ctx.method(), ctx.path(), e.getMessage(), e);
             ctx.status(500).json(new ErrorResponseDTO(
@@ -127,7 +142,6 @@ public class ApplicationConfig {
             ));
         });
     }
-
 
 
     private static void configureLogging(Javalin app) {
@@ -149,5 +163,9 @@ public class ApplicationConfig {
         });
     }
 
+    public static void configureSecurity(Javalin app, SecurityController securityController) {
+        app.beforeMatched(securityController.authenticate());
+        app.beforeMatched(securityController.authorize());
+    }
 
 }
