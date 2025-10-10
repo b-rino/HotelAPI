@@ -1,6 +1,5 @@
 package app.routes;
 
-import app.controllers.AccessController;
 import app.controllers.SecurityController;
 import app.daos.SecurityDAO;
 import app.enums.RoleEnum;
@@ -18,7 +17,6 @@ public class SecurityRoutes {
 
     private final SecurityController securityController;
     private final ObjectMapper mapper;
-    private final AccessController accessController;
 
     public SecurityRoutes(EntityManagerFactory emf){
         SecurityDAO dao = new SecurityDAO(emf);
@@ -26,9 +24,7 @@ public class SecurityRoutes {
         ISecurityService securityService = new SecurityService(dao, securityUtils);
         this.mapper = new Utils().getObjectMapper();
 
-
         this.securityController = new SecurityController(securityService, mapper);
-        this.accessController = new AccessController(securityController);
     }
 
 
@@ -44,12 +40,14 @@ public class SecurityRoutes {
 
     public EndpointGroup getSecuredRoutes() {
         return () -> {
-            //Filter der agerer middleware før efterfølgende ruter tilgås
-            before(ctx -> accessController.accessHandler(ctx));
 
             get("user_demo", (ctx)->ctx.json(mapper.createObjectNode().put("msg", "Hello from USER Protected")), RoleEnum.USER);
             get("admin_demo", (ctx)->ctx.json(mapper.createObjectNode().put("msg", "Hello from ADMIN Protected")), RoleEnum.ADMIN);
+            get("both_demo", (ctx)->ctx.json(mapper.createObjectNode().put("msg", "Hello from both Protected")), RoleEnum.ADMIN, RoleEnum.USER);
         };
     }
 
+    public SecurityController getSecurityController() {
+        return securityController;
+    }
 }

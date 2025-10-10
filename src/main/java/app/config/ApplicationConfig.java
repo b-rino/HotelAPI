@@ -1,8 +1,10 @@
 package app.config;
 
+import app.controllers.SecurityController;
 import app.dtos.ErrorResponseDTO;
 import app.exceptions.*;
 import app.routes.Routes;
+import app.routes.SecurityRoutes;
 import io.javalin.Javalin;
 import io.javalin.http.UnauthorizedResponse;
 import jakarta.persistence.EntityManager;
@@ -14,10 +16,9 @@ public class ApplicationConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(ApplicationConfig.class);
 
-
-
     public static Javalin startServer(int port, EntityManagerFactory emf) {
         Routes routes = new Routes(emf);
+        SecurityRoutes securityRoutes = new SecurityRoutes(emf);
         Javalin app = Javalin.create(config -> {
             config.showJavalinBanner = false;
             config.bundledPlugins.enableRouteOverview("/routes");
@@ -25,6 +26,7 @@ public class ApplicationConfig {
             config.router.apiBuilder(routes.getRoutes());
         });
 
+        configureSecurity(app, securityRoutes.getSecurityController());
         configureLogging(app);
         configureExceptionHandling(app);
 
@@ -142,7 +144,6 @@ public class ApplicationConfig {
     }
 
 
-
     private static void configureLogging(Javalin app) {
         app.before(ctx -> {
             logger.info("Incoming request: [{}] {} at {}", ctx.method(), ctx.path(), java.time.LocalDateTime.now());
@@ -162,5 +163,9 @@ public class ApplicationConfig {
         });
     }
 
+    public static void configureSecurity(Javalin app, SecurityController securityController) {
+        app.beforeMatched(securityController.authenticate());
+        app.beforeMatched(securityController.authorize());
+    }
 
 }
