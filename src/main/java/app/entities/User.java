@@ -2,29 +2,32 @@ package app.entities;
 
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @Table(name = "users")
 public class User {
 
     @Id
     @Column(name = "username", nullable = false)
+    @EqualsAndHashCode.Include
+    @ToString.Include
     private String username;
+    @Column(nullable = false)
     private String password;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    @EqualsAndHashCode.Exclude
     private Set<Role> roles;
 
     public User(String username, String password){

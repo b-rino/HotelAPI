@@ -1,6 +1,7 @@
 package app.controllers;
 
 import app.dtos.UserDTO;
+import app.entities.Role;
 import app.entities.User;
 import app.exceptions.ValidationException;
 import app.services.ISecurityService;
@@ -42,7 +43,15 @@ public class SecurityController implements ISecurityController {
             if (checkedUser == null) {
                 throw new ValidationException("Invalid username or password");
             }
-            ObjectNode on = mapper.createObjectNode().put("msg", "Login was successful");
+
+            Set<String> roleNames = checkedUser.getRoles().stream().map(Role::getRoleName).collect(Collectors.toSet());
+            UserDTO userDTO = new UserDTO(checkedUser.getUsername(), roleNames);
+
+            String token = securityService.createToken(userDTO);
+
+            ObjectNode on = mapper.createObjectNode().
+                    put("token", token).
+                    put("Username", userDTO.getUsername());
             ctx.json(on).status(200);
         };
     }

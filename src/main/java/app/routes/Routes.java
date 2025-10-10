@@ -3,8 +3,7 @@ package app.routes;
 import io.javalin.apibuilder.EndpointGroup;
 import jakarta.persistence.EntityManagerFactory;
 
-import static io.javalin.apibuilder.ApiBuilder.get;
-import static io.javalin.apibuilder.ApiBuilder.path;
+import static io.javalin.apibuilder.ApiBuilder.*;
 
 public class Routes {
 
@@ -28,6 +27,7 @@ public class Routes {
             path("hotel", hotelRoutes.getRoutes());
             path("room", roomRoutes.getRoutes());
             path("auth", securityRoutes.getRoutes());
+            path("protected", securityRoutes.getSecuredRoutes());
         };
     }
 }

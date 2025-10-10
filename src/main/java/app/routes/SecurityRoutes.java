@@ -2,6 +2,7 @@ package app.routes;
 
 import app.controllers.SecurityController;
 import app.daos.SecurityDAO;
+import app.enums.RoleEnum;
 import app.services.ISecurityService;
 import app.services.SecurityService;
 import app.utils.SecurityUtils;
@@ -15,12 +16,13 @@ import static io.javalin.apibuilder.ApiBuilder.*;
 public class SecurityRoutes {
 
     private final SecurityController securityController;
+    private final ObjectMapper mapper;
 
     public SecurityRoutes(EntityManagerFactory emf){
         SecurityDAO dao = new SecurityDAO(emf);
         SecurityUtils securityUtils = new SecurityUtils();
         ISecurityService securityService = new SecurityService(dao, securityUtils);
-        ObjectMapper mapper = new Utils().getObjectMapper();
+        this.mapper = new Utils().getObjectMapper();
 
         this.securityController = new SecurityController(securityService, mapper);
     }
@@ -38,8 +40,8 @@ public class SecurityRoutes {
 
     public EndpointGroup getSecuredRoutes() {
         return () -> {
-            get("authenticate", securityController.authenticate());
-            get("authorize", securityController.authorize());
+            get("user_demo", (ctx)->ctx.json(mapper.createObjectNode().put("msg", "Hello from USER Protected")), RoleEnum.USER);
+            get("admin_demo", (ctx)->ctx.json(mapper.createObjectNode().put("msg", "Hello from ADMIN Protected")), RoleEnum.ADMIN);
         };
     }
 

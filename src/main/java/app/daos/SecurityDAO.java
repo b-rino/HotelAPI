@@ -6,9 +6,7 @@ import app.entities.User;
 import app.exceptions.EntityAlreadyExistsException;
 import app.exceptions.EntityNotFoundException;
 import app.exceptions.ValidationException;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
+import jakarta.persistence.*;
 
 public class SecurityDAO implements ISecurityDAO {
 
@@ -21,14 +19,22 @@ public class SecurityDAO implements ISecurityDAO {
     @Override
     public User getVerifiedUser(String username, String password) throws ValidationException {
         try (EntityManager em = emf.createEntityManager()) {
-            User foundUser = em.find(User.class, username);
+            TypedQuery<User> query = em.createQuery(
+                    "SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.username = :username", User.class);
+            query.setParameter("username", username);
+
+            User foundUser = query.getSingleResult();
+
             if (foundUser.checkPassword(password)) {
                 return foundUser;
             } else {
                 throw new ValidationException("Invalid username or password");
             }
+        } catch (NoResultException e) {
+            throw new ValidationException("User not found");
         }
     }
+
 
     @Override
     public User createUser(String username, String password) throws EntityAlreadyExistsException {

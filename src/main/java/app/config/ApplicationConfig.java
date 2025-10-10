@@ -4,6 +4,7 @@ import app.dtos.ErrorResponseDTO;
 import app.exceptions.*;
 import app.routes.Routes;
 import io.javalin.Javalin;
+import io.javalin.http.UnauthorizedResponse;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.slf4j.Logger;
@@ -116,6 +117,18 @@ public class ApplicationConfig {
                     ctx.method().toString()
             ));
         });
+
+        //Javalin exception, which I import and then override output to JSON! Default is status code 401 and no JSON (+ added logging)
+        app.exception(UnauthorizedResponse.class, (e, ctx) -> {
+            logger.warn("Handled UnauthorizedResponse at [{}] {}: {}", ctx.method(), ctx.path(), e.getMessage());
+            ctx.status(401).json(new ErrorResponseDTO(
+                    "Unauthorized access",
+                    e.getMessage(),
+                    ctx.path(),
+                    ctx.method().toString()
+            ));
+        });
+
 
         app.exception(Exception.class, (e, ctx) -> {
             logger.error("Unhandled exception at [{}] {}: {}", ctx.method(), ctx.path(), e.getMessage(), e);

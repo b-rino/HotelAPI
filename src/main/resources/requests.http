@@ -51,8 +51,8 @@ POST http://localhost:7073/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "username": "admin",
-  "password": "admin"
+  "username": "benjamin12345",
+  "password": "1234"
 }
 
 
@@ -61,6 +61,13 @@ POST http://localhost:7073/api/v1/auth/register
 Content-Type: application/json
 
 {
-  "username": "admin4454",
+  "username": "benjamin12345",
   "password": "1234"
 }
+
+###
+GET http://localhost:7073/api/v1/protected/user_demo
+
+
+###
+GET http://localhost:7073/api/v1/protected/admin_demo
