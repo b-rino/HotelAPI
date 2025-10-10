@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
+import io.javalin.http.UnauthorizedResponse;
+import io.javalin.security.RouteRole;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -78,15 +80,17 @@ public class SecurityController implements ISecurityController {
 
     @Override
     public Handler authenticate() {
+
         return ctx -> {
             if (ctx.method().toString().equals("OPTIONS")){
                 ctx.status(200);
                 return;
             }
 
-            //If the endpoint is not protected with roles (or open to role ANYONE) then skip
             Set<String> allowedRoles = ctx.routeRoles().stream().
                     map(role -> role.toString().toUpperCase()).collect(Collectors.toSet());
+
+            //If the endpoint is not protected with roles (or open to role ANYONE) then skip
             if(SecurityUtils.isOpenEndpoint(allowedRoles))
                 return;
 

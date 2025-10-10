@@ -61,7 +61,7 @@ POST http://localhost:7073/api/v1/auth/register
 Content-Type: application/json
 
 {
-  "username": "benjamin12345",
+  "username": "benjamin123457",
   "password": "1234"
 }
 
@@ -71,3 +71,8 @@ GET http://localhost:7073/api/v1/protected/user_demo
 
 ###
 GET http://localhost:7073/api/v1/protected/admin_demo
+
+
+###
+GET http://localhost:7073/api/v1/protected/user_demo
+Authorization: Bearer "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJcIkJlbmphbWluIFJpbm9cIiIsInN1YiI6ImJlbmphbWluMTIzNDU3IiwiZXhwIjoxNzYwMDkxMDc1LCJyb2xlcyI6IlVzZXIiLCJ1c2VybmFtZSI6ImJlbmphbWluMTIzNDU3In0.Bfk_5wj2Q7UYWYb8rskkNfwW9ylo8sPUuPlN6KlT6Gc"
