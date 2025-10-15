@@ -1,19 +1,20 @@
 #!/bin/bash
 
-#Delete payload.json after done
-trap 'rm --f payload.json' EXIT
- 
-# Create JSON payload for hotel
-cat > payload.json <<EOF
-{
-  "name": "Hotel Helsingør",
-  "address": "Strandvejen 25"
-}
-EOF
+# Brug: ./create-hotel.sh "<name>" "<address>"
 
-# Send POST request to your backend API
-curl -X POST \
-     -H "Content-Type: application/json" \
-     -d @payload.json \
-     http://localhost:7000/api/v1/hotel
+NAME=$1
+ADDRESS=$2
 
+# Tjek om begge argumenter er givet
+if [ $# -ne 2 ]; then
+  echo "Brug: $0 \"<name>\" \"<address>\""
+  exit 1
+fi
+
+# Send POST-request med JSON payload
+curl -s -X POST https://hotel.brino.dk/api/v1/hotel \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"name\": \"$NAME\",
+    \"address\": \"$ADDRESS\"
+  }"

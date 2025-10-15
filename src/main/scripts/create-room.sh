@@ -12,20 +12,11 @@ if [ $# -ne 3 ]; then
   exit 1
 fi
 
-# Slet payload automatisk når scriptet afsluttes
-trap 'rm -f room-payload.json' EXIT
-
-# Opret JSON payload
-cat > room-payload.json <<EOF
-{
-  "hotelId": $HOTEL_ID,
-  "number": "$ROOM_NUMBER",
-  "price": $PRICE
-}
-EOF
-
-# Send POST-request til API
-curl -X POST \
-     -H "Content-Type: application/json" \
-     -d @room-payload.json \
-     http://localhost:7000/api/v1/room
+# Send POST-request direkte med inline JSON
+curl -s -X POST https://hotel.brino.dk/api/v1/room \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"hotelId\": $HOTEL_ID,
+    \"number\": \"$ROOM_NUMBER\",
+    \"price\": $PRICE
+  }"
