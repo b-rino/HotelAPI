@@ -51,22 +51,6 @@ public class SecurityService implements ISecurityService{
         }
     }
 
-/*    @Override
-    public String getToken(Context ctx) throws TokenVerificationException {
-        String header = ctx.header("Authorization");
-        if (header == null || header.isBlank()) {
-            logger.warn("Missing Authorization header at [{}] {}", ctx.method().toString(), ctx.path());
-            throw new TokenVerificationException("Authorization header is missing");
-        }
-
-        String[] parts = header.split(" ");
-        if (parts.length != 2 || !parts[0].equalsIgnoreCase("Bearer") || parts[1].isBlank()) {
-            logger.warn("Malformed Authorization header at [{}] {}: '{}'", ctx.method().toString(), ctx.path(), header);
-            throw new TokenVerificationException("Authorization header is malformed");
-        }
-        return parts[1];
-    } */
-
 
     @Override
     public UserDTO verifyToken(String token) throws TokenVerificationException {
@@ -88,9 +72,12 @@ public class SecurityService implements ISecurityService{
 
             return securityUtils.getUserWithRolesFromToken(token);
 
-        } catch (ParseException | TokenVerificationException e) {
-            logger.warn("Token verification failed: {}", e.getMessage(), e);
-            throw new TokenVerificationException("Could not verify token", e);
+        } catch (ParseException e) {
+            logger.warn("Token parsing failed: {}", e.getMessage());
+            throw new TokenVerificationException("Token is malformed", e);
+            //Smider dem som jeg har lavet i hvert if-statement i stedet for at override dem med en ny
+        } catch (TokenVerificationException e) {
+            throw e;
         }
     }
 

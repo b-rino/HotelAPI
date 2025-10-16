@@ -126,7 +126,4 @@ public class SecurityController implements ISecurityController {
         ctx.status(200).json("{\"msg\": \"API is up and running\"}");
     }
 
-    public void dockerHub(Context ctx) {
-        ctx.status(200).json("{\"msg\": \"Dockerhub works!\"}");
-    }
 }
