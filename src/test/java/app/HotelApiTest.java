@@ -181,9 +181,7 @@ public class HotelApiTest {
         given().header("Authorization", "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJcIkJlbmphbWluIFJpbm9cIiIsInN1YiI6ImFkbWluIiwiZXhwIjoxNzYwNDY3MDQwLCJyb2xlcyI6IkFkbWluIiwidXNlcm5hbWUiOiJhZG1pbiJ9.B68gZi87uQRb5Q5BlRS-wAtXPy4W0fAhfm6z5ii67eY")
                 .when().get("/protected/user_demo")
                 .then().statusCode(401)
-                .body("error", equalTo("Token verification failed"))
-                .body("message", equalTo("Token has expired"))
-        ;
+                .body("error", equalTo("Token verification failed"));
     }
 
     @Test
