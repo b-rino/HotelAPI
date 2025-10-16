@@ -33,7 +33,6 @@ public class SecurityRoutes {
             post("login", securityController.login());
             post("register", securityController.register());
             get("healthcheck", securityController::healthCheck);
-            get("dockerhub", securityController::dockerHub);
         };
     }
 

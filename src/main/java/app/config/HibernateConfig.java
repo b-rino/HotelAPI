@@ -42,7 +42,6 @@ public class HibernateConfig {
         return emfTest;
     }
 
-    // TODO: IMPORTANT: Add Entity classes here for them to be registered with Hibernate
     private static void getAnnotationConfiguration(Configuration configuration) {
         configuration.addAnnotatedClass(Hotel.class);
         configuration.addAnnotatedClass(Room.class);
@@ -54,7 +53,7 @@ public class HibernateConfig {
         try {
             Configuration configuration = new Configuration();
             Properties props = new Properties();
-            // Set the properties
+
             setBaseProperties(props);
             if (forTest) {
                 props = setTestProperties(props);

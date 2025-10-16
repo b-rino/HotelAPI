@@ -2,6 +2,7 @@ package app.config;
 
 import app.controllers.SecurityController;
 import app.dtos.ErrorResponseDTO;
+import app.enums.RoleEnum;
 import app.exceptions.*;
 import app.routes.Routes;
 import app.routes.SecurityRoutes;
@@ -12,6 +13,7 @@ import jakarta.persistence.EntityManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 public class ApplicationConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(ApplicationConfig.class);
@@ -21,7 +23,7 @@ public class ApplicationConfig {
         SecurityRoutes securityRoutes = new SecurityRoutes(emf);
         Javalin app = Javalin.create(config -> {
             config.showJavalinBanner = false;
-            config.bundledPlugins.enableRouteOverview("/routes");
+            config.bundledPlugins.enableRouteOverview("/routes", RoleEnum.ANYONE);
             config.router.contextPath = "/api/v1";
             config.router.apiBuilder(routes.getRoutes());
         });
