@@ -1,11 +1,11 @@
 ### Ping the API
-GET http://localhost:7073/api/v1/
+GET {{baseUrl}}
 
 ### Get all hotels
-GET http://localhost:7073/api/v1/hotel
+GET {{baseUrl}}hotel
 
 ### Create a hotel
-POST http://localhost:7073/api/v1/hotel
+POST {{baseUrl}}hotel
 Content-Type: application/json
 
 {
@@ -14,10 +14,10 @@ Content-Type: application/json
 }
 
 ### Get hotel by ID
-GET http://localhost:7073/api/v1/hotel/3
+GET {{baseUrl}}hotel/1
 
 ### Update hotel
-PUT http://localhost:7073/api/v1/hotel/3
+PUT {{baseUrl}}hotel/1
 Content-Type: application/json
 
 {
@@ -26,37 +26,37 @@ Content-Type: application/json
 }
 
 ### Get rooms for hotel
-GET http://localhost:7073/api/v1/hotel/1/rooms
+GET {{baseUrl}}hotel/2/rooms
 
 ### Delete hotel
-DELETE http://localhost:7073/api/v1/hotel/3
+DELETE {{baseUrl}}hotel/2
 
 ---
 
 ### Add room to hotel
-POST http://localhost:7073/api/v1/room
+POST {{baseUrl}}room
 Content-Type: application/json
 
 {
-  "hotelId": 1,
-  "number": "905",
+  "hotelId": 2,
+  "number": "555",
   "price": 9500.0
 }
 
 ### Delete room
-DELETE http://localhost:7073/api/v1/room/6
+DELETE {{baseUrl}}room/36
 
 ### Log in user
-POST http://localhost:7073/api/v1/auth/login
+POST {{baseUrl}}auth/login
 Content-Type: application/json
 
 {
-  "username": "benjamin12345",
-  "password": "1234"
+  "username": "user",
+  "password": "user"
 }
 
 ### Log in admin
-POST http://localhost:7073/api/v1/auth/login
+POST {{baseUrl}}auth/login
 Content-Type: application/json
 
 {
@@ -66,27 +66,27 @@ Content-Type: application/json
 
 
 ### Register
-POST http://localhost:7073/api/v1/auth/register
+POST {{baseUrl}}auth/register
 Content-Type: application/json
 
 {
-  "username": "benjamin123457",
-  "password": "1234"
+  "username": "user",
+  "password": "user"
 }
 
 
 
 ### protected ADMIN
-GET http://localhost:7073/api/v1/protected/admin_demo
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJcIkJlbmphbWluIFJpbm9cIiIsInN1YiI6ImFkbWluIiwiZXhwIjoxNzYwNDY3MDQwLCJyb2xlcyI6IkFkbWluIiwidXNlcm5hbWUiOiJhZG1pbiJ9.B68gZi87uQRb5Q5BlRS-wAtXPy4W0fAhfm6z5ii67eY
+GET {{baseUrl}}protected/admin_demo
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJCZW5qYW1pbiBSaW5vIiwic3ViIjoidXNlciIsImV4cCI6MTc2MTI0MDY0MSwicm9sZXMiOiJVc2VyIiwidXNlcm5hbWUiOiJ1c2VyIn0.T1CnU_K1qyJoimwOEW0HZOQSQhyLVjwtNeu5RbGCoXA
 
 
 ### protected USER
-GET http://localhost:7073/api/v1/protected/user_demo
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJcIkJlbmphbWluIFJpbm9cIiIsInN1YiI6ImJlbmphbWluMTIzNDUiLCJleHAiOjE3NjA0NjcwNjAsInJvbGVzIjoiVXNlciIsInVzZXJuYW1lIjoiYmVuamFtaW4xMjM0NSJ9.ZDMy88ZxkUzsps15DQffvrAKrsTdiHymZUa-4FDaFcM
+GET {{baseUrl}}protected/user_demo
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJCZW5qYW1pbiBSaW5vIiwic3ViIjoidXNlciIsImV4cCI6MTc2MTI0MDY0MSwicm9sZXMiOiJVc2VyIiwidXNlcm5hbWUiOiJ1c2VyIn0.T1CnU_K1qyJoimwOEW0HZOQSQhyLVjwtNeu5RbGCoXA
 
 
 
 ### protected ANYONE
-GET http://localhost:7073/api/v1/protected/both_demo
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJcIkJlbmphbWluIFJpbm9cIiIsInN1YiI6ImJlbmphbWluMTIzNDUiLCJleHAiOjE3NjA0NjcwNjAsInJvbGVzIjoiVXNlciIsInVzZXJuYW1lIjoiYmVuamFtaW4xMjM0NSJ9.ZDMy88ZxkUzsps15DQffvrAKrsTdiHymZUa-4FDaFcM
+GET {{baseUrl}}protected/both_demo
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJCZW5qYW1pbiBSaW5vIiwic3ViIjoidXNlciIsImV4cCI6MTc2MTI0MDY0MSwicm9sZXMiOiJVc2VyIiwidXNlcm5hbWUiOiJ1c2VyIn0.T1CnU_K1qyJoimwOEW0HZOQSQhyLVjwtNeu5RbGCoXA
