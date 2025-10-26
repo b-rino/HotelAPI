@@ -162,7 +162,7 @@ GET-endpoints som fx `/hotel` og `/hotel/{id}` kan frit tilgås via browseren, d
 ## 🔗 Projektlink
 
 - Live API: [hotel.brino.dk](https://hotel.brino.dk/api/v1/routes)
-- GitHub-repo: [github.com/BenjaminRino/HotelAPI](https://github.com/BenjaminRino/HotelAPI)
+- GitHub-repo: [github.com/b-rino/HotelAPI](https://github.com/b-rino/HotelAPI)
 - Portfolio: [brino.dk](https://brino.dk)
 
 
